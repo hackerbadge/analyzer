@@ -236,7 +236,10 @@ func sendToCollector(promos []Promotion) (resp *http.Response, err error) {
 		return nil, err
 	}
 	r := bytes.NewReader(data)
-	return http.Post(config.CollectorApi, "application/json", r)
+	resp, err = http.Post(config.CollectorApi, "application/json", r)
+	fmt.Println("sending to collector finished. Sent promos: %d", len(promos))
+	fmt.Println("error: %v", err)
+	return
 }
 
 func Analyze(data []Commit) ([]Promotion, error) {
