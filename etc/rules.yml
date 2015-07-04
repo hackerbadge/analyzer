@@ -1,22 +1,24 @@
 -
-  dirs:
+  paths:
     - project/alpha/search
-  files:
     - project/lib/search.php
   tag: search
+  xp: 10
 - 
-  dirs:
+  paths:
     - project/beta/webroot
     - project/beta/resources
   tag: frontend
+  xp: 5
 -
-  files:
+  paths:
     - .go$
     - .java$
     - .cpp$
   tag: ninja
+  xp: 10
 -
-  dirs:
+  paths:
   	- foobar
-  files:
   tag: foobar
+  xp: 1

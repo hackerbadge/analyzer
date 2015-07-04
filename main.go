@@ -40,8 +40,8 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	rulesAnalyzer = NewRulesAnalyzer(rules)
-	languageAnalyzer = NewLanguageAnalyzer()
+	rulesAnalyzer = NewRulesAnalyzer(rules, config.Source)
+	languageAnalyzer = NewLanguageAnalyzer(config.DefaultXp)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/commit", CommitHandler).

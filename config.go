@@ -13,6 +13,8 @@ type Config struct {
 	Port         int
 	RulesFile    string
 	CollectorApi string
+	Source       string
+	DefaultXp    float64
 }
 
 func NewConfig(configPath string) (*Config, error) {
@@ -26,7 +28,9 @@ func (c *Config) FlagVariables() {
 	flag.StringVar(&c.Host, "host", "localhost", "Web server host")
 	flag.IntVar(&c.Port, "port", 3000, "port number")
 	flag.StringVar(&c.RulesFile, "rules", "", "file with rules")
-	flag.StringVar(&c.CollectorApi, "collector_api", "", "localhost:10100")
+	flag.StringVar(&c.CollectorApi, "collector_api", "localhost:10100", "Collector API endpoint")
+	flag.StringVar(&c.Source, "source", "github", "default source for promotions")
+	flag.Float64Var(&c.DefaultXp, "default_xp", 2.0, "default XP for promotions")
 }
 
 func (c *Config) LoadFile(configPath string) error {

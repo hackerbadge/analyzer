@@ -1,5 +1,7 @@
 package main
 
+import "regexp"
+
 type Payload struct {
 	Commits []Commit `json:"commits"`
 }
@@ -31,7 +33,48 @@ type Promotion struct {
 }
 
 type Rule struct {
-	Dirs  []string `yaml:"dirs"`
-	Files []string `yaml:"files"`
+	Paths []string `yaml:"paths"`
 	Tag   string   `yaml:"tag"`
+	Xp    float64  `yaml:"xp"`
+
+	initialized bool
+	regexps     []*regexp.Regexp
+}
+
+func (this *Rule) Init() {
+	this.initialized = true
+
+	this.regexps = make([]*regexp.Regexp, len(this.Paths))
+	for i, path := range this.Paths {
+		this.regexps[i] = regexp.MustCompile(path)
+	}
+}
+
+func (this *Rule) Apply(c *Commit) bool {
+	if !this.initialized {
+		this.Init()
+	}
+
+	for _, fname := range c.Added {
+		if this.applyForFilename(fname) {
+			return true
+		}
+	}
+
+	for _, fname := range c.Modified {
+		if this.applyForFilename(fname) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (this *Rule) applyForFilename(name string) bool {
+	for _, r := range this.regexps {
+		if r.MatchString(name) {
+			return true
+		}
+	}
+	return false
 }

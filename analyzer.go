@@ -7,6 +7,7 @@ type Analyzer interface {
 }
 
 type LanguageAnalyzer struct {
+	xp float64
 }
 
 // Analyze commits coming from a single source
@@ -53,24 +54,51 @@ func (a *LanguageAnalyzer) Analyze(commits []Commit) ([]Promotion, error) {
 
 	for username, langs := range langsByUser {
 		for lang, _ := range langs {
-			promotions = append(promotions, Promotion{source, username, lang, 10})
+			promotions = append(promotions, Promotion{source, username, lang, a.xp})
 		}
 	}
 
 	return promotions, nil
 }
 
-type RulesAnalyzer struct {
+func NewLanguageAnalyzer(defaultXp float64) Analyzer {
+	return &LanguageAnalyzer{defaultXp}
 }
 
-func (a *RulesAnalyzer) Analyze(commits []Commit) ([]Promotion, error) {
-	return []Promotion{}, nil
+func NewRulesAnalyzer(rules []Rule, source string) Analyzer {
+	return &rulesAnalyzerImpl{rules, source}
 }
 
-func NewLanguageAnalyzer() Analyzer {
-	return &LanguageAnalyzer{}
+type rulesAnalyzerImpl struct {
+	rules  []Rule
+	source string
 }
 
-func NewRulesAnalyzer(rules []Rule) Analyzer {
-	return &RulesAnalyzer{}
+func (this *rulesAnalyzerImpl) Analyze(data []Commit) ([]Promotion, error) {
+	result := []Promotion{}
+	for i := range data {
+		commit := &data[i]
+		promos := this.analyzeCommit(commit)
+
+		result = append(result, promos...)
+	}
+
+	return result, nil
+}
+
+func (this *rulesAnalyzerImpl) analyzeCommit(commit *Commit) []Promotion {
+	promos := []Promotion{}
+	for i := range this.rules {
+		rule := &this.rules[i]
+		if rule.Apply(commit) {
+			promos = append(promos, Promotion{
+				Source:   this.source,
+				Username: commit.Author.Username,
+				Tag:      rule.Tag,
+				Xp:       rule.Xp,
+			})
+
+		}
+	}
+	return promos
 }
