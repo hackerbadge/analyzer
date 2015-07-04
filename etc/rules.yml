@@ -1,0 +1,22 @@
+-
+  dirs:
+    - project/alpha/search
+  files:
+    - project/lib/search.php
+  tag: search
+- 
+  dirs:
+    - project/beta/webroot
+    - project/beta/resources
+  tag: frontend
+-
+  files:
+    - .go$
+    - .java$
+    - .cpp$
+  tag: ninja
+-
+  dirs:
+  	- foobar
+  files:
+  tag: foobar
