@@ -7,7 +7,8 @@ type Analyzer interface {
 }
 
 type LanguageAnalyzer struct {
-	xp float64
+	source string
+	xp     float64
 }
 
 // Analyze commits coming from a single source
@@ -15,54 +16,55 @@ func (a *LanguageAnalyzer) Analyze(commits []Commit) ([]Promotion, error) {
 
 	exts := map[string]string{
 		".php":  "php",
+		".java": "java",
 		".cpp":  "cpp",
 		".c":    "c",
 		".go":   "golang",
 		".py":   "python",
 		".rb":   "ruby",
+		".js":   "javascript",
 		".css":  "css",
 		".html": "html",
 		".sh":   "bash",
 	}
 
-	var source string = "github"
 	var promotions []Promotion
-	var langsByUser = make(map[string]map[string]int)
+	var langsByUser = make(map[string][]string)
 	var lang string
 
 	for _, commit := range commits {
 		username := commit.Author.Username
 		_, userExists := langsByUser[username]
 		if !userExists {
-			langsByUser[username] = make(map[string]int)
+			langsByUser[username] = []string{}
 		}
 		for _, file := range commit.Added {
 			ext := filepath.Ext(file)
 			lang, _ = exts[ext]
 			if lang != "" {
-				langsByUser[username][lang] = 1
+				langsByUser[username] = AppendUnique(langsByUser[username], lang)
 			}
 		}
 		for _, file := range commit.Modified {
 			ext := filepath.Ext(file)
 			lang, _ = exts[ext]
 			if lang != "" {
-				langsByUser[username][lang] = 1
+				langsByUser[username] = AppendUnique(langsByUser[username], lang)
 			}
 		}
 	}
 
 	for username, langs := range langsByUser {
-		for lang, _ := range langs {
-			promotions = append(promotions, Promotion{source, username, lang, a.xp})
+		for _, lang := range langs {
+			promotions = append(promotions, Promotion{a.source, username, lang, a.xp})
 		}
 	}
 
 	return promotions, nil
 }
 
-func NewLanguageAnalyzer(defaultXp float64) Analyzer {
-	return &LanguageAnalyzer{defaultXp}
+func NewLanguageAnalyzer(source string, defaultXp float64) Analyzer {
+	return &LanguageAnalyzer{source, defaultXp}
 }
 
 func NewRulesAnalyzer(rules []Rule, source string) Analyzer {

@@ -41,7 +41,7 @@ func main() {
 		panic(err.Error())
 	}
 	rulesAnalyzer = NewRulesAnalyzer(rules, config.Source)
-	languageAnalyzer = NewLanguageAnalyzer(config.DefaultXp)
+	languageAnalyzer = NewLanguageAnalyzer(config.Source, config.DefaultXp)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/commit", CommitHandler).
@@ -107,4 +107,23 @@ func Analyze(data []Commit) ([]Promotion, error) {
 
 	promotions = append(languagePromos, rulesPromos...)
 	return promotions, nil
+}
+
+// AppendUnique appends items to a slice if they do not exist in that slice yet
+func AppendUnique(slice []string, elems ...string) (ret []string) {
+	ret = slice
+	for _, elem := range elems {
+		var b bool = true
+		for _, s := range slice {
+			// fmt.Printf("%+v - %+v\n", s, elem)
+			if elem == s {
+				b = false
+				continue
+			}
+		}
+		if b {
+			ret = append(ret, elem)
+		}
+	}
+	return ret
 }
