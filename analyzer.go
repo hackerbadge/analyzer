@@ -34,7 +34,7 @@ func (a *languageAnalyzerImpl) Analyze(commits []Commit) ([]Promotion, error) {
 	var lang string
 
 	for _, commit := range commits {
-		username := commit.Author.Username
+		username := commit.Author.Email
 		_, userExists := langsByUser[username]
 		if !userExists {
 			langsByUser[username] = []string{}
@@ -61,7 +61,8 @@ func (a *languageAnalyzerImpl) Analyze(commits []Commit) ([]Promotion, error) {
 				Source:   a.source,
 				Username: username,
 				Tag:      lang,
-				Xp:       a.xp})
+				Xp:       a.xp,
+			})
 		}
 	}
 
@@ -79,7 +80,7 @@ func (a *languageAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Prom
 
 	fmt.Println("[Language Analyzer - Analyze Full] Start looping through commits...")
 	for _, commit := range commits {
-		name = commit.Commit.Author.Name
+		name = commit.Commit.Author.Email
 		_, userExists := langsByUser[name]
 		if !userExists {
 			langsByUser[name] = []string{}
@@ -99,7 +100,12 @@ func (a *languageAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Prom
 	fmt.Printf("%+v\n\n", langsByUser)
 	for name, langs := range langsByUser {
 		for _, lang := range langs {
-			promotions = append(promotions, Promotion{a.source, name, lang, a.xp})
+			promotions = append(promotions, Promotion{
+				Source:   a.source,
+				Username: name,
+				Tag:      lang,
+				Xp:       a.xp,
+			})
 		}
 	}
 
