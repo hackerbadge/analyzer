@@ -3,22 +3,22 @@
     - project/alpha/search
     - project/lib/search.php
   tag: search
-  xp: 10
+  points: 10
 -
   paths:
     - project/beta/webroot
     - project/beta/resources
   tag: frontend
-  xp: 5
+  points: 5
 -
   paths:
     - .go$
     - .java$
     - .cpp$
   tag: ninja
-  xp: 10
+  points: 10
 -
   paths:
     - foobar
   tag: foobar
-  xp: 1
+  points: 1

@@ -9,12 +9,12 @@ import (
 )
 
 type Config struct {
-	Host         string
-	Port         int
-	RulesFile    string
-	CollectorApi string
-	Source       string
-	DefaultXp    float64
+	Host          string
+	Port          int
+	RulesFile     string
+	CollectorApi  string
+	Source        string
+	DefaultPoints float64
 }
 
 func NewConfig(configPath string) (*Config, error) {
@@ -30,7 +30,7 @@ func (c *Config) FlagVariables() {
 	flag.StringVar(&c.RulesFile, "rules", "", "file with rules")
 	flag.StringVar(&c.CollectorApi, "collector_api", "localhost:10100", "Collector API endpoint")
 	flag.StringVar(&c.Source, "source", "github", "default source for promotions")
-	flag.Float64Var(&c.DefaultXp, "default_xp", 2.0, "default XP for promotions")
+	flag.Float64Var(&c.DefaultPoints, "default_points", 2.0, "default points for promotions")
 }
 
 func (c *Config) LoadFile(configPath string) error {

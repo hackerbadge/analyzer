@@ -29,10 +29,10 @@ type User struct {
 
 type Promotion struct {
 	Source    string  `json:"source"`
-	Username  string  `json:"username"`
+	Username  string  `json:"user"`
 	AvatarUrl string  `json:"avatar_url"`
 	Tag       string  `json:"tag"`
-	Xp        float64 `json:"xp"`
+	Points    float64 `json:"points"`
 }
 
 type GithubCommit struct {
@@ -60,9 +60,9 @@ type GithubSingleCommit struct {
 }
 
 type Rule struct {
-	Paths []string `yaml:"paths"`
-	Tag   string   `yaml:"tag"`
-	Xp    float64  `yaml:"xp"`
+	Paths  []string `yaml:"paths"`
+	Tag    string   `yaml:"tag"`
+	Points float64  `yaml:"points"`
 
 	initialized bool
 	regexps     []*regexp.Regexp

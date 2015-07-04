@@ -1,7 +1,9 @@
 package main
 
-import "path/filepath"
-import "fmt"
+import (
+	"log"
+	"path/filepath"
+)
 
 type Analyzer interface {
 	Analyze(data []Commit) ([]Promotion, error)
@@ -10,7 +12,7 @@ type Analyzer interface {
 
 type languageAnalyzerImpl struct {
 	source string
-	xp     float64
+	points float64
 }
 
 var exts = map[string]string{
@@ -61,7 +63,7 @@ func (a *languageAnalyzerImpl) Analyze(commits []Commit) ([]Promotion, error) {
 				Source:   a.source,
 				Username: username,
 				Tag:      lang,
-				Xp:       a.xp,
+				Points:   a.points,
 			})
 		}
 	}
@@ -71,8 +73,6 @@ func (a *languageAnalyzerImpl) Analyze(commits []Commit) ([]Promotion, error) {
 
 // Analyze commits coming from a full repo import
 func (a *languageAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Promotion, error) {
-	fmt.Println("[Language Analyzer - Analyze Full] Start looping through commits...")
-
 	var promotions []Promotion
 
 	for _, commit := range commits {
@@ -93,28 +93,26 @@ func (a *languageAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Prom
 			}
 		}
 
-		fmt.Printf("LANGS = %+v\n", langs)
 		for _, lang := range langs {
-
 			promotions = append(promotions, Promotion{
 				Source:   a.source,
 				Username: name,
 				Tag:      lang,
-				Xp:       a.xp,
+				Points:   a.points,
 			})
 		}
 	}
 
-	fmt.Printf("PROMOTIONS = %d\n", len(promotions))
+	log.Printf("[INFO] Analyzed total promotions = %d\n", len(promotions))
 	for _, p := range promotions {
-		fmt.Printf("%+v\n", p)
+		log.Printf("%+v\n", p)
 	}
 
 	return promotions, nil
 }
 
-func NewLanguageAnalyzer(source string, defaultXp float64) Analyzer {
-	return &languageAnalyzerImpl{source, defaultXp}
+func NewLanguageAnalyzer(source string, defaultPoints float64) Analyzer {
+	return &languageAnalyzerImpl{source, defaultPoints}
 }
 
 func NewRulesAnalyzer(rules []Rule, source string) Analyzer {
@@ -147,7 +145,7 @@ func (this *rulesAnalyzerImpl) analyzeCommit(commit *Commit) []Promotion {
 				Source:   this.source,
 				Username: commit.Author.Email,
 				Tag:      rule.Tag,
-				Xp:       rule.Xp,
+				Points:   rule.Points,
 			})
 
 		}

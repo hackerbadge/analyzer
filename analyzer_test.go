@@ -36,7 +36,7 @@ func TestLanguageAnalyzer(t *testing.T) {
 	}
 
 	for i, p := range want {
-		if got[i].Source != p.Source || got[i].Tag != p.Tag || got[i].Username != p.Username || got[i].Xp != p.Xp {
+		if got[i].Source != p.Source || got[i].Tag != p.Tag || got[i].Username != p.Username || got[i].Points != p.Points {
 			t.Fatalf("Item %v, want %#v, got %#v", i, p, got[i])
 		}
 	}
@@ -45,19 +45,19 @@ func TestLanguageAnalyzer(t *testing.T) {
 func TestRulesAnalyzer(t *testing.T) {
 	rules := []Rule{
 		Rule{
-			Paths: []string{"rules", "etc/\\*"},
-			Tag:   "ruler",
-			Xp:    10.0,
+			Paths:  []string{"rules", "etc/\\*"},
+			Tag:    "ruler",
+			Points: 10.0,
 		},
 		Rule{
-			Paths: []string{"\\.py$"},
-			Tag:   "ninja",
-			Xp:    15.0,
+			Paths:  []string{"\\.py$"},
+			Tag:    "ninja",
+			Points: 15.0,
 		},
 		Rule{
-			Paths: []string{"etc/foobarmode"},
-			Tag:   "foobariel",
-			Xp:    1050.0,
+			Paths:  []string{"etc/foobarmode"},
+			Tag:    "foobariel",
+			Points: 1050.0,
 		},
 	}
 	a := NewRulesAnalyzer(rules, "foob")
@@ -76,7 +76,7 @@ func TestRulesAnalyzer(t *testing.T) {
 	}
 
 	for i, p := range want {
-		if got[i].Source != p.Source || got[i].Tag != p.Tag || got[i].Username != p.Username || got[i].Xp != p.Xp {
+		if got[i].Source != p.Source || got[i].Tag != p.Tag || got[i].Username != p.Username || got[i].Points != p.Points {
 			t.Fatalf("Item %v, want %#v, got %#v", i, p, got[i])
 		}
 	}

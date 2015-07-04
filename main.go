@@ -46,7 +46,7 @@ func main() {
 		panic(err.Error())
 	}
 	rulesAnalyzer = NewRulesAnalyzer(rules, config.Source)
-	languageAnalyzer = NewLanguageAnalyzer(config.Source, config.DefaultXp)
+	languageAnalyzer = NewLanguageAnalyzer(config.Source, config.DefaultPoints)
 
 	r := mux.NewRouter()
 
@@ -63,7 +63,7 @@ func main() {
 	}
 
 	http.Handle("/", r)
-	fmt.Printf("Listening on port %d\n", config.Port)
+	log.Printf("Listening on port %d\n", config.Port)
 
 	listen := fmt.Sprintf("%s:%d", config.Host, config.Port)
 	log.Println(http.ListenAndServe(listen, nil))
@@ -97,7 +97,7 @@ func CommitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("message for user %s, given XP: %f\n", promos[0].Username, promos[0].Xp)
+	log.Printf("message for user %s, given points: %f\n", promos[0].Username, promos[0].Points)
 
 	// HACK
 	for i := range promos {
@@ -156,16 +156,30 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send singleCommits to analyzer
-	analyzer := NewLanguageAnalyzer(config.Source, config.DefaultXp)
-	analyzer.AnalyzeFull(singleCommits)
+	analyzer := NewLanguageAnalyzer(config.Source, config.DefaultPoints)
+	promos, err := analyzer.AnalyzeFull(singleCommits)
+	if err != nil {
+		panic(err)
+	}
 
-	fmt.Fprintln(w, "ok")
+	if len(promos) == 0 {
+		return
+	}
+
+	resp, err := sendToCollector(promos)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer resp.Body.Close()
+	respData, err := ioutil.ReadAll(resp.Body)
+	log.Println("Response from Collector API:" + string(respData))
+	w.Write(respData)
 }
 
 func fetchCommitURL(url, clientId, clientSecret string, ch chan GithubSingleCommit, wg *sync.WaitGroup) {
 	defer wg.Done()
 	url = fmt.Sprintf("%s?client_id=%s&client_secret=%s", url, clientId, clientSecret)
-	fmt.Printf("Getting %s\n", url)
+	log.Printf("[DEBUG] Fetching single Commit URL %s\n", url)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -182,7 +196,7 @@ func fetchCommitURL(url, clientId, clientSecret string, ch chan GithubSingleComm
 		panic(err)
 	}
 
-	fmt.Printf("Commit = %+v\n", *singleCommit)
+	log.Printf("[DEBUG] Fetched commit %+v\n", *singleCommit)
 	ch <- *singleCommit
 }
 
@@ -197,7 +211,7 @@ func fetchAllCommitURLs(name, clientId, clientSecret string) ([]string, error) {
 	// loop and fetch all pages of /commits API, collect all URLs of single commits
 	for {
 		apiUrl := fmt.Sprintf("https://api.github.com/repos/%s/commits?page=%d&per_page=%d&client_id=%s&client_secret=%s", name, page, perPage, clientId, clientSecret)
-		fmt.Printf("Getting %s\n", apiUrl)
+		log.Printf("[DEBUG] Fetching Commits List from %s\n", apiUrl)
 
 		resp, err := http.Get(apiUrl)
 		if err != nil {
@@ -231,10 +245,12 @@ func fetchAllCommitURLs(name, clientId, clientSecret string) ([]string, error) {
 }
 
 func sendToCollector(promos []Promotion) (resp *http.Response, err error) {
+	log.Printf("Sending %d promotions to %s\n", len(promos), config.CollectorApi)
 	data, err := json.Marshal(promos)
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("Posting to Collector API %s, payload=%s\n", config.CollectorApi, data)
 	r := bytes.NewReader(data)
 	resp, err = http.Post(config.CollectorApi, "application/json", r)
 	fmt.Println("sending to collector finished. Sent promos: %d", len(promos))
@@ -265,7 +281,6 @@ func AppendUnique(slice []string, elems ...string) (ret []string) {
 	for _, elem := range elems {
 		var b bool = true
 		for _, s := range slice {
-			// fmt.Printf("%+v - %+v\n", s, elem)
 			if elem == s {
 				b = false
 				continue
