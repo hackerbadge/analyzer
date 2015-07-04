@@ -5,6 +5,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/yaml.v2"
@@ -46,6 +48,11 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/commit", CommitHandler).
 		Methods("POST")
+	if port := os.Getenv("VCAP_APP_PORT"); len(port) != 0 {
+		if p, e := strconv.Atoi(port); e == nil && p > 0 {
+			config.Port = int(p)
+		}
+	}
 
 	http.Handle("/", r)
 }
