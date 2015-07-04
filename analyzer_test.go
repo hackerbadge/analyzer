@@ -20,5 +20,25 @@ var mockCommits = []Commit{mockCommit}
 
 func TestLanguageAnalyzer(t *testing.T) {
 	a := NewLanguageAnalyzer()
-	a.Analyze(mockCommits)
+	got, err := a.Analyze(mockCommits)
+
+	if err != nil {
+		t.Fatalf("Failed with error: %#v", err)
+	}
+
+	want := []Promotion{
+		Promotion{"github", "solidfoxrock", "python", 10},
+		Promotion{"github", "solidfoxrock", "bash", 10},
+		Promotion{"github", "solidfoxrock", "golang", 10},
+	}
+
+	if len(got) != len(want) {
+		t.Fatalf("Want count = %v, got count = %v", len(want), len(got))
+	}
+
+	for i, p := range want {
+		if got[i].Source != p.Source || got[i].Tag != p.Tag || got[i].Username != p.Username || got[i].Xp != p.Xp {
+			t.Fatalf("Item %v, want %#v, got %#v", i, p, got[i])
+		}
+	}
 }
