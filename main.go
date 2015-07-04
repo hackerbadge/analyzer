@@ -60,7 +60,7 @@ func main() {
 	fmt.Printf("Listening on port %d\n", config.Port)
 
 	listen := fmt.Sprintf("%s:%d", config.Host, config.Port)
-	log.Printf(http.ListenAndServe(listen, nil))
+	log.Println(http.ListenAndServe(listen, nil))
 }
 
 func readRules(f string) ([]Rule, error) {
