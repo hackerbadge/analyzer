@@ -8,7 +8,6 @@ var mockCommit = Commit{
 	Added:     []string{"bin/setup.py", "bin/say-hello.sh"},
 	Author:    mockUser,
 	Committer: mockUser,
-	Distinct:  true,
 	ID:        "aa45b6ee05606d0c62e580bbde433c43ea1136b7",
 	Message:   "Fix a Heisenbug",
 	Modified:  []string{"etc/app.ini", "etc/rules.yml", "main.go"},

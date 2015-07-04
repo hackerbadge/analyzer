@@ -1,33 +1,34 @@
 package main
 
 import "path/filepath"
+import "fmt"
 
 type Analyzer interface {
 	Analyze(data []Commit) ([]Promotion, error)
+	AnalyzeFull(data []GithubSingleCommit) ([]Promotion, error)
 }
 
-type LanguageAnalyzer struct {
+type languageAnalyzerImpl struct {
 	source string
 	xp     float64
 }
 
+var exts = map[string]string{
+	".php":  "php",
+	".java": "java",
+	".cpp":  "cpp",
+	".c":    "c",
+	".go":   "golang",
+	".py":   "python",
+	".rb":   "ruby",
+	".js":   "javascript",
+	".css":  "css",
+	".html": "html",
+	".sh":   "bash",
+}
+
 // Analyze commits coming from a single source
-func (a *LanguageAnalyzer) Analyze(commits []Commit) ([]Promotion, error) {
-
-	exts := map[string]string{
-		".php":  "php",
-		".java": "java",
-		".cpp":  "cpp",
-		".c":    "c",
-		".go":   "golang",
-		".py":   "python",
-		".rb":   "ruby",
-		".js":   "javascript",
-		".css":  "css",
-		".html": "html",
-		".sh":   "bash",
-	}
-
+func (a *languageAnalyzerImpl) Analyze(commits []Commit) ([]Promotion, error) {
 	var promotions []Promotion
 	var langsByUser = make(map[string][]string)
 	var lang string
@@ -67,8 +68,51 @@ func (a *LanguageAnalyzer) Analyze(commits []Commit) ([]Promotion, error) {
 	return promotions, nil
 }
 
+// Analyze commits coming from a full repo import
+func (a *languageAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Promotion, error) {
+
+	var (
+		promotions  []Promotion
+		langsByUser = make(map[string][]string)
+		lang, name  string
+	)
+
+	fmt.Println("[Language Analyzer - Analyze Full] Start looping through commits...")
+	for _, commit := range commits {
+		name = commit.Commit.Author.Name
+		_, userExists := langsByUser[name]
+		if !userExists {
+			langsByUser[name] = []string{}
+		}
+
+		for _, file := range commit.Files {
+			if file.Status == "modified" || file.Status == "added" {
+				ext := filepath.Ext(file.FileName)
+				lang, _ = exts[ext]
+				if lang != "" {
+					langsByUser[name] = AppendUnique(langsByUser[name], lang)
+				}
+			}
+		}
+	}
+
+	fmt.Printf("%+v\n\n", langsByUser)
+	for name, langs := range langsByUser {
+		for _, lang := range langs {
+			promotions = append(promotions, Promotion{a.source, name, lang, a.xp})
+		}
+	}
+
+	fmt.Println("PROMOTIONS")
+	for _, p := range promotions {
+		fmt.Printf("%+v\n", p)
+	}
+
+	return promotions, nil
+}
+
 func NewLanguageAnalyzer(source string, defaultXp float64) Analyzer {
-	return &LanguageAnalyzer{source, defaultXp}
+	return &languageAnalyzerImpl{source, defaultXp}
 }
 
 func NewRulesAnalyzer(rules []Rule, source string) Analyzer {
@@ -107,4 +151,10 @@ func (this *rulesAnalyzerImpl) analyzeCommit(commit *Commit) []Promotion {
 		}
 	}
 	return promos
+}
+
+// Analyze commits coming from a full repo import
+func (a *rulesAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Promotion, error) {
+	var promotions []Promotion
+	return promotions, nil
 }

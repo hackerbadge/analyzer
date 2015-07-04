@@ -13,7 +13,6 @@ type Commit struct {
 	Added     []string `json:"added"`
 	Author    User     `json:"author"`
 	Committer User     `json:"committer"`
-	Distinct  bool     `json:"distinct"`
 	ID        string   `json:"id"`
 	Message   string   `json:"message"`
 	Modified  []string `json:"modified"`
@@ -34,6 +33,30 @@ type Promotion struct {
 	AvatarUrl string  `json:"avatar_url"`
 	Tag       string  `json:"tag"`
 	Xp        float64 `json:"xp"`
+}
+
+type GithubCommit struct {
+	// Commit struct {
+	// Author struct {
+	// 	Name  string
+	// 	Email string
+	// } `json:"author`
+	// Url string `json:"url"`
+	// } `json:"commit"`
+	Url string `json:"url"`
+}
+
+type GithubSingleCommit struct {
+	Commit struct {
+		Author struct {
+			Name  string `json:"name"`
+			Email string `json:"email"`
+		}
+	} `json:"commit"`
+	Files []struct {
+		FileName string `json:"filename"`
+		Status   string `json:"status"`
+	} `json:"files"`
 }
 
 type Rule struct {
