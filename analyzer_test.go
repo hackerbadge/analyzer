@@ -19,7 +19,7 @@ var mockCommit = Commit{
 var mockCommits = []Commit{mockCommit}
 
 func TestLanguageAnalyzer(t *testing.T) {
-	a := NewLanguageAnalyzer(10.0)
+	a := NewLanguageAnalyzer("gitlab", 10.0)
 	got, err := a.Analyze(mockCommits)
 
 	if err != nil {
@@ -27,9 +27,9 @@ func TestLanguageAnalyzer(t *testing.T) {
 	}
 
 	want := []Promotion{
-		Promotion{"github", "solidfoxrock", "python", 10},
-		Promotion{"github", "solidfoxrock", "bash", 10},
-		Promotion{"github", "solidfoxrock", "golang", 10},
+		Promotion{"gitlab", "solidfoxrock", "python", 10},
+		Promotion{"gitlab", "solidfoxrock", "bash", 10},
+		Promotion{"gitlab", "solidfoxrock", "golang", 10},
 	}
 
 	if len(got) != len(want) {

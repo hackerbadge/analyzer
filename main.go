@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -43,7 +45,7 @@ func main() {
 		panic(err.Error())
 	}
 	rulesAnalyzer = NewRulesAnalyzer(rules, config.Source)
-	languageAnalyzer = NewLanguageAnalyzer(config.DefaultXp)
+	languageAnalyzer = NewLanguageAnalyzer(config.Source, config.DefaultXp)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/commit", CommitHandler).
@@ -55,6 +57,8 @@ func main() {
 	}
 
 	http.Handle("/", r)
+	fmt.Printf("Listening on port %d\n", config.Port)
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(config.Port), nil))
 }
 
 func readRules(f string) ([]Rule, error) {
@@ -69,6 +73,7 @@ func readRules(f string) ([]Rule, error) {
 }
 
 func CommitHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("%#v\n\n\n", r.Body)
 	decoder := json.NewDecoder(r.Body)
 	p := Payload{}
 	err := decoder.Decode(&p)
@@ -114,4 +119,23 @@ func Analyze(data []Commit) ([]Promotion, error) {
 
 	promotions = append(languagePromos, rulesPromos...)
 	return promotions, nil
+}
+
+// AppendUnique appends items to a slice if they do not exist in that slice yet
+func AppendUnique(slice []string, elems ...string) (ret []string) {
+	ret = slice
+	for _, elem := range elems {
+		var b bool = true
+		for _, s := range slice {
+			// fmt.Printf("%+v - %+v\n", s, elem)
+			if elem == s {
+				b = false
+				continue
+			}
+		}
+		if b {
+			ret = append(ret, elem)
+		}
+	}
+	return ret
 }
