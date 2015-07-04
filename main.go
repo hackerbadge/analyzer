@@ -87,6 +87,12 @@ func CommitHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
+	if len(promos) == 0 {
+		return
+	}
+
+	log.Fatalf("message for user %s, given XP: %f\n", promos[0].Username, promos[0].Xp)
+
 	// HACK
 	for i := range promos {
 		promos[i].AvatarUrl = p.Sender.AvatarUrl

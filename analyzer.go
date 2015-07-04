@@ -99,7 +99,7 @@ func (this *rulesAnalyzerImpl) analyzeCommit(commit *Commit) []Promotion {
 		if rule.Apply(commit) {
 			promos = append(promos, Promotion{
 				Source:   this.source,
-				Username: commit.Author.Username,
+				Username: commit.Author.Email,
 				Tag:      rule.Tag,
 				Xp:       rule.Xp,
 			})
