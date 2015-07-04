@@ -27,9 +27,9 @@ func TestLanguageAnalyzer(t *testing.T) {
 	}
 
 	want := []Promotion{
-		Promotion{"gitlab", "solidfoxrock", "python", 10},
-		Promotion{"gitlab", "solidfoxrock", "bash", 10},
-		Promotion{"gitlab", "solidfoxrock", "golang", 10},
+		Promotion{"gitlab", "solidfoxrock", "", "python", 10},
+		Promotion{"gitlab", "solidfoxrock", "", "bash", 10},
+		Promotion{"gitlab", "solidfoxrock", "", "golang", 10},
 	}
 
 	if len(got) != len(want) {
@@ -69,8 +69,8 @@ func TestRulesAnalyzer(t *testing.T) {
 	}
 
 	want := []Promotion{
-		Promotion{"foob", "solidfoxrock", "ruler", 10.0},
-		Promotion{"foob", "solidfoxrock", "ninja", 15},
+		Promotion{"foob", "solidfoxrock", "", "ruler", 10.0},
+		Promotion{"foob", "solidfoxrock", "", "ninja", 15},
 	}
 	if len(got) != len(want) {
 		t.Fatalf("Want count = %v, got count = %v", len(want), len(got))

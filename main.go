@@ -87,6 +87,11 @@ func CommitHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
+	// HACK
+	for i := range promos {
+		promos[i].AvatarUrl = p.Sender.AvatarUrl
+	}
+
 	resp, err := sendToCollector(promos)
 	if err != nil {
 		panic(err.Error())

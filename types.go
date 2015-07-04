@@ -4,6 +4,9 @@ import "regexp"
 
 type Payload struct {
 	Commits []Commit `json:"commits"`
+	Sender  struct {
+		AvatarUrl string `json:"avatar_url"`
+	} `json:"sender"`
 }
 
 type Commit struct {
@@ -26,10 +29,11 @@ type User struct {
 }
 
 type Promotion struct {
-	Source   string  `json:"source"`
-	Username string  `json:"username"`
-	Tag      string  `json:"tag"`
-	Xp       float64 `json:"xp"`
+	Source    string  `json:"source"`
+	Username  string  `json:"username"`
+	AvatarUrl string  `json:"avatar_url"`
+	Tag       string  `json:"tag"`
+	Xp        float64 `json:"xp"`
 }
 
 type Rule struct {

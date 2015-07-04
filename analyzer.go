@@ -56,7 +56,11 @@ func (a *LanguageAnalyzer) Analyze(commits []Commit) ([]Promotion, error) {
 
 	for username, langs := range langsByUser {
 		for _, lang := range langs {
-			promotions = append(promotions, Promotion{a.source, username, lang, a.xp})
+			promotions = append(promotions, Promotion{
+				Source:   a.source,
+				Username: username,
+				Tag:      lang,
+				Xp:       a.xp})
 		}
 	}
 
