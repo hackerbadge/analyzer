@@ -2,6 +2,7 @@
 *.o
 *.a
 *.so
+analyzer
 
 # Folders
 _obj

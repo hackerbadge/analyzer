@@ -71,35 +71,31 @@ func (a *languageAnalyzerImpl) Analyze(commits []Commit) ([]Promotion, error) {
 
 // Analyze commits coming from a full repo import
 func (a *languageAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Promotion, error) {
-
-	var (
-		promotions  []Promotion
-		langsByUser = make(map[string][]string)
-		lang, name  string
-	)
-
 	fmt.Println("[Language Analyzer - Analyze Full] Start looping through commits...")
+
+	var promotions []Promotion
+
 	for _, commit := range commits {
-		name = commit.Commit.Author.Email
-		_, userExists := langsByUser[name]
-		if !userExists {
-			langsByUser[name] = []string{}
-		}
+
+		var (
+			lang  string
+			langs = []string{}
+			name  = commit.Commit.Author.Email
+		)
 
 		for _, file := range commit.Files {
 			if file.Status == "modified" || file.Status == "added" {
 				ext := filepath.Ext(file.FileName)
 				lang, _ = exts[ext]
 				if lang != "" {
-					langsByUser[name] = AppendUnique(langsByUser[name], lang)
+					langs = AppendUnique(langs, lang)
 				}
 			}
 		}
-	}
 
-	fmt.Printf("%+v\n\n", langsByUser)
-	for name, langs := range langsByUser {
+		fmt.Printf("LANGS = %+v\n", langs)
 		for _, lang := range langs {
+
 			promotions = append(promotions, Promotion{
 				Source:   a.source,
 				Username: name,
@@ -109,7 +105,7 @@ func (a *languageAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Prom
 		}
 	}
 
-	fmt.Println("PROMOTIONS")
+	fmt.Printf("PROMOTIONS = %d\n", len(promotions))
 	for _, p := range promotions {
 		fmt.Printf("%+v\n", p)
 	}
