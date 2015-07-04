@@ -25,3 +25,7 @@ func NewLanguageAnalyzer() Analyzer {
 func NewRulesAnalyzer() Analyzer {
 	return &RulesAnalyzer{}
 }
+
+func NewRulesAnalyzer(rules []Rule) Analyzer {
+	return nil
+}
