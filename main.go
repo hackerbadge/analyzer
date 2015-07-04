@@ -60,7 +60,7 @@ func main() {
 	fmt.Printf("Listening on port %d\n", config.Port)
 
 	listen := fmt.Sprintf("%s:%d", config.Host, config.Port)
-	log.Fatal(http.ListenAndServe(listen, nil))
+	log.Printf(http.ListenAndServe(listen, nil))
 }
 
 func readRules(f string) ([]Rule, error) {
@@ -91,7 +91,7 @@ func CommitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Fatalf("message for user %s, given XP: %f\n", promos[0].Username, promos[0].Xp)
+	log.Printf("message for user %s, given XP: %f\n", promos[0].Username, promos[0].Xp)
 
 	// HACK
 	for i := range promos {
