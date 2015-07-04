@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -58,7 +58,9 @@ func main() {
 
 	http.Handle("/", r)
 	fmt.Printf("Listening on port %d\n", config.Port)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(config.Port), nil))
+
+	listen := fmt.Sprintf("%s:%d", config.Host, config.Port)
+	log.Fatal(http.ListenAndServe(listen, nil))
 }
 
 func readRules(f string) ([]Rule, error) {
@@ -73,7 +75,6 @@ func readRules(f string) ([]Rule, error) {
 }
 
 func CommitHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("%#v\n\n\n", r.Body)
 	decoder := json.NewDecoder(r.Body)
 	p := Payload{}
 	err := decoder.Decode(&p)
@@ -96,11 +97,11 @@ func CommitHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendToCollector(promos []Promotion) (resp *http.Response, err error) {
-	r, w := io.Pipe()
-	enc := json.NewEncoder(w)
-	if err := enc.Encode(promos); err != nil {
+	data, err := json.Marshal(promos)
+	if err != nil {
 		return nil, err
 	}
+	r := bytes.NewReader(data)
 	return http.Post(config.CollectorApi, "application/json", r)
 }
 
