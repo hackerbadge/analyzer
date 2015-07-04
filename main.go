@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/yaml.v2"
@@ -48,6 +51,8 @@ func main() {
 		Methods("POST")
 
 	http.Handle("/", r)
+	fmt.Printf("Listening on port %d\n", config.Port)
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(config.Port), nil))
 }
 
 func readRules(f string) ([]Rule, error) {
@@ -62,6 +67,7 @@ func readRules(f string) ([]Rule, error) {
 }
 
 func CommitHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("%#v\n\n\n", r.Body)
 	decoder := json.NewDecoder(r.Body)
 	p := Payload{}
 	err := decoder.Decode(&p)

@@ -4,7 +4,7 @@
     - project/lib/search.php
   tag: search
   xp: 10
-- 
+-
   paths:
     - project/beta/webroot
     - project/beta/resources
@@ -19,6 +19,6 @@
   xp: 10
 -
   paths:
-  	- foobar
+    - foobar
   tag: foobar
   xp: 1
