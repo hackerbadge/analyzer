@@ -8,6 +8,13 @@ type LanguageAnalyzer struct {
 }
 
 func (a *LanguageAnalyzer) Analyze(commits []Commit) ([]Promotion, error) {
+	users := make(map[string]string)
+	promotions := []Promotion{}
+
+	for commit := range commits {
+		// TODO
+	}
+
 	return []Promotion{}, nil
 }
 
@@ -22,10 +29,6 @@ func NewLanguageAnalyzer() Analyzer {
 	return &LanguageAnalyzer{}
 }
 
-func NewRulesAnalyzer() Analyzer {
-	return &RulesAnalyzer{}
-}
-
 func NewRulesAnalyzer(rules []Rule) Analyzer {
-	return nil
+	return &RulesAnalyzer{}
 }
