@@ -36,7 +36,7 @@ func (a *languageAnalyzerImpl) Analyze(commits []Commit) ([]Promotion, error) {
 	var lang string
 
 	for _, commit := range commits {
-		username := commit.Author.Email
+		username := commit.Author.Name
 		_, userExists := langsByUser[username]
 		if !userExists {
 			langsByUser[username] = []string{}
@@ -80,7 +80,7 @@ func (a *languageAnalyzerImpl) AnalyzeFull(commits []GithubSingleCommit) ([]Prom
 		var (
 			lang  string
 			langs = []string{}
-			name  = commit.Commit.Author.Email
+			name  = commit.Commit.Author.Name
 		)
 
 		for _, file := range commit.Files {
@@ -143,7 +143,7 @@ func (this *rulesAnalyzerImpl) analyzeCommit(commit *Commit) []Promotion {
 		if rule.Apply(commit) {
 			promos = append(promos, Promotion{
 				Source:   this.source,
-				Username: commit.Author.Email,
+				Username: commit.Author.Name,
 				Tag:      rule.Tag,
 				Points:   rule.Points,
 			})
