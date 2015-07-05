@@ -104,7 +104,9 @@ func CommitHandler(w http.ResponseWriter, r *http.Request) {
 		promos[i].AvatarUrl = p.Sender.AvatarUrl
 	}
 
-	resp, err := sendToCollector(promos)
+	teamID := r.URL.Query().Get("team_id")
+
+	resp, err := sendToCollector(promos, teamID)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -166,7 +168,8 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := sendToCollector(promos)
+	teamID := r.URL.Query().Get("team_id")
+	resp, err := sendToCollector(promos, teamID)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -244,7 +247,7 @@ func fetchAllCommitURLs(name, clientId, clientSecret string) ([]string, error) {
 	return commitUrls, err
 }
 
-func sendToCollector(promos []Promotion) (resp *http.Response, err error) {
+func sendToCollector(promos []Promotion, teamID string) (resp *http.Response, err error) {
 	log.Printf("Sending %d promotions to %s\n", len(promos), config.CollectorApi)
 	data, err := json.Marshal(promos)
 	if err != nil {
@@ -252,7 +255,7 @@ func sendToCollector(promos []Promotion) (resp *http.Response, err error) {
 	}
 	log.Printf("Posting to Collector API %s, payload=%s\n", config.CollectorApi, data)
 	r := bytes.NewReader(data)
-	resp, err = http.Post(config.CollectorApi, "application/json", r)
+	resp, err = http.Post(config.CollectorApi+"?team_id="+teamID, "application/json", r)
 	fmt.Println("sending to collector finished. Sent promos: %d", len(promos))
 	fmt.Println("error: %v", err)
 	return
